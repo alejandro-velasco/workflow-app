@@ -16,22 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from gitFlow.views import (
-    git_repos_list_view,
-    git_repo_detail_by_name_view,
-    git_repo_delete_by_name_view,
-    git_repo_detail_by_id_view,
-    git_repo_delete_by_id_view,
-    git_repo_create_view
+    git_repos_list,
+    git_repo_detail_by_name,
+    git_repo_detail_by_id,
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('repos/', git_repos_list_view),
-    path('repos/name/<str:repo_name>', git_repo_detail_by_name_view),
-    path('repos/id/<int:repo_id>', git_repo_detail_by_id_view),
-    path('repos/create', git_repo_create_view),
-    #path('repos/update', git_repo_create_update_view),
-    path('repos/delete/name/<str:repo_name>', git_repo_delete_by_name_view),
-    path('repos/delete/id/<str:repo_id>', git_repo_delete_by_id_view),
+    path('repos/', git_repos_list, name='git-repo-list'),
+    path('repos/name/<str:repo_name>', git_repo_detail_by_name, name='git-repo-name-details'),
+    path('repos/id/<int:repo_id>', git_repo_detail_by_id, name='git-repo-id-details'),
 
 ]

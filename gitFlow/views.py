@@ -1,5 +1,6 @@
 from django.shortcuts import render
 
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
@@ -7,104 +8,63 @@ from .models import GitRepos
 from .serializer import GitReposSerializer
 
 # Get a list of registered Git repositories
-@api_view(['GET'])
-def git_repos_list_view(request, *args, **kwargs):
-    repo_list = GitRepos.objects.all()
-    repos = [x.serialize() for x in repo_list]
-    data = {
-        "response" : repos
-    }
-    return Response(data)
+@api_view(['GET', 'POST'])
+def git_repos_list(request, *args, **kwargs):
+    if request.method == 'GET':
+        git_repos = GitRepos.objects.all()
+        serializer = GitReposSerializer(git_repos, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = GitReposSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Get Git Repository Details by name
-@api_view(['GET'])
-def git_repo_detail_by_name_view(request, repo_name, *args, **kwargs):
-    data = {
-        "name" : repo_name
-    }
-    status = 200
+@api_view(['GET', 'PUT', 'DELETE'])
+def git_repo_detail_by_name(request, repo_name, *args, **kwargs):
     try:
         obj = GitRepos.objects.get(name=repo_name)
-        data['id'] = obj.id
-        data['url'] = obj.url
-        data['secure'] = obj.secure
-        data['description'] = obj.description
-        data['status'] = "ok"
+    except GitRepos.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    except:
-        data['message'] = "Not Found"
-        data['status'] = "error"
+    if request.method == 'GET':
+        serializer = GitReposSerializer(obj)
+        return Response(serializer.data)
 
-    return Response(data, status=status)
+    elif request.method == 'PUT':
+        serializer = GitReposSerializer(obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        obj.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # Get Git Repository Details by id
-@api_view(['GET'])
-def git_repo_detail_by_id_view(request, repo_id, *args, **kwargs):
-    data = {
-        "id" : repo_id
-    }
-    status = 200
+@api_view(['GET', 'PUT', 'DELETE'])
+def git_repo_detail_by_id(request, repo_id, *args, **kwargs):
     try:
         obj = GitRepos.objects.get(id=repo_id)
-        data['name'] = obj.name
-        data['url'] = obj.url
-        data['description'] = obj.description
-        data['secure'] = obj.secure
-        data['status'] = "ok"
+    except GitRepos.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    except:
-        data['message'] = "Not Found"
-        data['status'] = "error"
-
-    return Response(data, status=status)
-
-# Create Git Repository Entry
-@api_view(['POST'])
-def git_repo_create_view(request, *args, **kwargs):
-    serializer = GitReposSerializer(data=request.data or None)
-    if serializer.is_valid(raise_exception = True):
-        serializer.save()
+    if request.method == 'GET':
+        serializer = GitReposSerializer(obj)
         return Response(serializer.data)
-    return Response({}, status=400)
 
-# Delete Git repository entry by name
-@api_view(['DELETE'])
-def git_repo_delete_by_name_view(request, repo_name, *args, **kwargs):
-    data = {
-        "name" : repo_name
-    }
-    status = 200
-    try:
-        obj = GitRepos.objects.get(name=repo_name)
-        data['id'] = obj.id
-        data['url'] = obj.url
-        data['description'] = obj.description
-        data['secure'] = obj.secure
-        data['status'] = "successfully deleted"
+    elif request.method == 'PUT':
+        serializer = GitReposSerializer(obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
         obj.delete()
-    except:
-        data['message'] = "Not Found"
-        data['status'] = "error"
-
-    return Response(data, status=status)
-
-    # Delete Git repository entry by id
-@api_view(['DELETE'])
-def git_repo_delete_by_id_view(request, repo_id, *args, **kwargs):
-    data = {
-        "id" : repo_id
-    }
-    status = 200
-    try:
-        obj = GitRepos.objects.get(id=repo_id)
-        data['name'] = obj.name
-        data['url'] = obj.url
-        data['description'] = obj.description
-        data['secure'] = obj.secure
-        data['status'] = "successfully deleted"
-        obj.delete()
-    except:
-        data['message'] = "Not Found"
-        data['status'] = "error"
-
-    return Response(data, status=status)
+        return Response(status=status.HTTP_204_NO_CONTENT)
