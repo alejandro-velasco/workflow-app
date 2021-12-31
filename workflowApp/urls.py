@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from gitFlow.views import (
+    git_repos_list_view
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('repos/', git_repos_list_view)
 ]
