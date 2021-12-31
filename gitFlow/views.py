@@ -7,9 +7,12 @@ from rest_framework.decorators import api_view
 from .models import GitRepos
 from .serializer import GitReposSerializer
 
-# Get a list of registered Git repositories
 @api_view(['GET', 'POST'])
 def git_repos_list(request, *args, **kwargs):
+    """
+    GET: lists all current repositories
+    POST: Creates a new repository entry
+    """
     if request.method == 'GET':
         git_repos = GitRepos.objects.all()
         serializer = GitReposSerializer(git_repos, many=True)
@@ -25,6 +28,11 @@ def git_repos_list(request, *args, **kwargs):
 # Get Git Repository Details by name
 @api_view(['GET', 'PUT', 'DELETE'])
 def git_repo_detail_by_name(request, repo_name, *args, **kwargs):
+    """
+    GET: Gets Repository Specified by name
+    PUT: Updates Repository Specified by name
+    DELETE: Deletes Repository Specified by name
+    """
     try:
         obj = GitRepos.objects.get(name=repo_name)
     except GitRepos.DoesNotExist:
@@ -49,6 +57,11 @@ def git_repo_detail_by_name(request, repo_name, *args, **kwargs):
 # Get Git Repository Details by id
 @api_view(['GET', 'PUT', 'DELETE'])
 def git_repo_detail_by_id(request, repo_id, *args, **kwargs):
+    """
+    GET: Gets Repository Specified by id
+    PUT: Updates Repository Specified by id
+    DELETE: Deletes Repository Specified by id
+    """
     try:
         obj = GitRepos.objects.get(id=repo_id)
     except GitRepos.DoesNotExist:
