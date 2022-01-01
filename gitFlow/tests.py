@@ -16,6 +16,7 @@ class GitReposTestCase(TestCase):
             url='https://github.com/testcase/repo.git',
             description='A Test Case Repository',
             secure='True'
+            current_version='v0.0.0'
         )
         self.assertEqual(git_repo_obj.id, 1)
 
@@ -29,7 +30,8 @@ class GitReposAPITests(APITestCase):
             'name': 'test',
             'url': 'http://localhost:8080/test.git',
             'description': 'test',
-            'secure': False
+            'secure': False,
+            'current_version': 'v0.0.0'
         }
         response_post = self.client.post(url, data, format='json')
         response_get = self.client.get(url, format='json')

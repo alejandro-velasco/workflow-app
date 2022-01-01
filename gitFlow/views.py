@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view
 
 from .models import GitRepos
 from .serializer import GitReposSerializer
+from .utils.actions import repo_setup
 
 @api_view(['GET', 'POST'])
 def git_repos_list(request, *args, **kwargs):
@@ -21,6 +22,12 @@ def git_repos_list(request, *args, **kwargs):
     elif request.method == 'POST':
         serializer = GitReposSerializer(data=request.data)
         if serializer.is_valid():
+            try:
+                repo_setup(serializer.validated_data['url'],
+                           serializer.validated_data['name'],
+                           serializer.validated_data['current_version'])
+            except Exception as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

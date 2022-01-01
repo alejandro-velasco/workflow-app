@@ -7,7 +7,7 @@ from .models import GitRepos
 class GitReposSerializer(serializers.ModelSerializer):
     class Meta:
         model = GitRepos
-        fields = ['name', 'url', 'description', 'secure']
+        fields = ['name', 'url', 'description', 'secure', 'current_version']
 
     def validate_description(self, value):
         if len(value) > 300:
