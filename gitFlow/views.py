@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 
 from .models import GitRepos
 from .serializer import GitReposSerializer
-from .utils.actions import repo_setup
+from .utils.actions import repo_setup, repo_delete
 
 @api_view(['GET', 'POST'])
 def git_repos_list(request, *args, **kwargs):
@@ -57,6 +57,7 @@ def git_repo_detail_by_name(request, repo_name, *args, **kwargs):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        repo_delete(getattr(obj, 'name'))
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -86,5 +87,6 @@ def git_repo_detail_by_id(request, repo_id, *args, **kwargs):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        repo_delete(getattr(obj, 'name'))
         obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
