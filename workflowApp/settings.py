@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-l^sx*!md+h6iqvaud!h3a%3h(ks(oj0(wp%!wz*z6ka&5=g8w@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gitFlow',
     'rest_framework',
+    'git',
 ]
 
 MIDDLEWARE = [
@@ -76,9 +78,17 @@ WSGI_APPLICATION = 'workflowApp.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME' : os.environ.get('PG_DATABASE'),
+        'USER' : os.environ.get('PG_USER'),
+        'PASSWORD' : os.environ.get('PG_PASSWORD'),
+        'HOST' : os.environ.get('PG_HOST'),
+        'PORT' : os.environ.get('PG_PORT'),
     }
 }
 
