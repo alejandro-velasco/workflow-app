@@ -8,6 +8,7 @@ django = "==4.0"
 djangorestframework = "*"
 gitpython = "*"
 django-q = "*"
+rsa = "*"
 
 [dev-packages]
 

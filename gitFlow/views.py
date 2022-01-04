@@ -25,7 +25,10 @@ def git_repos_list(request, *args, **kwargs):
             try:
                 repo_setup(serializer.validated_data['url'],
                            serializer.validated_data['name'],
-                           serializer.validated_data['current_version'])
+                           serializer.validated_data['current_version'],
+                           serializer.validated_data['git_user'],
+                           serializer.validated_data['git_email'],
+                           serializer.validated_data['git_pass'])
             except Exception as e:
                 return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
