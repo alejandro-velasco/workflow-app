@@ -53,7 +53,7 @@ def git_repo_detail_by_name(request, repo_name, *args, **kwargs):
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = GitReposSerializer(obj, data=request.data)
+        serializer = GitReposSerializer(obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -83,7 +83,7 @@ def git_repo_detail_by_id(request, repo_id, *args, **kwargs):
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = GitReposSerializer(obj, data=request.data)
+        serializer = GitReposSerializer(obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
