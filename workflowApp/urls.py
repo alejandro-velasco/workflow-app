@@ -17,14 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from gitFlow.views import (
     git_repos_list,
-    git_repo_detail_by_name,
-    git_repo_detail_by_id,
+    git_repo_detail,
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('repos/', git_repos_list, name='git-repo-list'),
-    path('repos/name/<str:repo_name>', git_repo_detail_by_name, name='git-repo-name-details'),
-    path('repos/id/<int:repo_id>', git_repo_detail_by_id, name='git-repo-id-details'),
-
+    path('repos/name/<str:repo_name>', git_repo_detail, name='git-repo-details')
 ]

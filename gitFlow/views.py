@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 
 from .models import GitRepos
 from .serializer import GitReposSerializer
-from .utils.actions import repo_setup, repo_delete
+from .utils.actions import repo_setup, repo_delete, repo_update
 
 @api_view(['GET', 'POST'])
 def git_repos_list(request, *args, **kwargs):
@@ -23,12 +23,7 @@ def git_repos_list(request, *args, **kwargs):
         serializer = GitReposSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                repo_setup(serializer.validated_data['url'],
-                           serializer.validated_data['name'],
-                           serializer.validated_data['current_version'],
-                           serializer.validated_data['git_user'],
-                           serializer.validated_data['git_email'],
-                           serializer.validated_data['git_pass'])
+                repo_setup(serializer.validated_data)
             except Exception as e:
                 return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
@@ -37,7 +32,7 @@ def git_repos_list(request, *args, **kwargs):
 
 # Get Git Repository Details by name
 @api_view(['GET', 'PUT', 'DELETE'])
-def git_repo_detail_by_name(request, repo_name, *args, **kwargs):
+def git_repo_detail(request, repo_name, *args, **kwargs):
     """
     GET: Gets Repository Specified by name
     PUT: Updates Repository Specified by name
@@ -55,41 +50,20 @@ def git_repo_detail_by_name(request, repo_name, *args, **kwargs):
     elif request.method == 'PUT':
         serializer = GitReposSerializer(obj, data=request.data, partial=True)
         if serializer.is_valid():
+            try:
+                repo_update(serializer.validated_data, repo_name)
+            except ValueError as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)   
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        repo_delete(getattr(obj, 'name'))
-        obj.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# Get Git Repository Details by id
-@api_view(['GET', 'PUT', 'DELETE'])
-def git_repo_detail_by_id(request, repo_id, *args, **kwargs):
-    """
-    GET: Gets Repository Specified by id
-    PUT: Updates Repository Specified by id
-    DELETE: Deletes Repository Specified by id
-    """
-    try:
-        obj = GitRepos.objects.get(id=repo_id)
-    except GitRepos.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = GitReposSerializer(obj)
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = GitReposSerializer(obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        repo_delete(getattr(obj, 'name'))
-        obj.delete()
+        try:
+            repo_delete(getattr(obj, 'name'))
+            obj.delete()
+        except FileNotFoundError:
+            obj.delete()
+            return Response('File Was Not Found. Deleted Reference to maintain database integrity.',
+                            status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
